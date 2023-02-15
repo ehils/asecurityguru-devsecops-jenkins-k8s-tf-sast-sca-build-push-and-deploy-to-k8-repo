@@ -1,5 +1,9 @@
 pipeline {
   agent any
+  options {
+        // This is required if you want to clean before build
+        skipDefaultCheckout(true)
+    }
   tools { 
         maven 'Maven_3_5_2'  
     }
@@ -20,6 +24,7 @@ pipeline {
 
 	stage('Build') { 
             steps { 
+		cleanWs)
                withDockerRegistry([credentialsId: "dockerlogin", url: ""]) {
                  script{
                  app =  docker.build("asg")
@@ -48,6 +53,17 @@ pipeline {
 		}
 	      }
    	}
-
+	
   }
+post {
+        // Clean after build
+        always {
+            cleanWs(cleanWhenNotBuilt: false,
+                    deleteDirs: true,
+                    disableDeferredWipeout: true,
+                    notFailBuild: true,
+                    patterns: [[pattern: '.gitignore', type: 'INCLUDE'],
+                               [pattern: '.propsfile', type: 'EXCLUDE']])
+        }
+    }
 }
