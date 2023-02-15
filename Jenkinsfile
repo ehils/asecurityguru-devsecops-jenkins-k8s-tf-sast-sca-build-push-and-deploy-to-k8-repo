@@ -24,7 +24,7 @@ pipeline {
 
 	stage('Build') { 
             steps { 
-		cleanWs)
+		cleanWs()
                withDockerRegistry([credentialsId: "dockerlogin", url: ""]) {
                  script{
                  app =  docker.build("asg")
